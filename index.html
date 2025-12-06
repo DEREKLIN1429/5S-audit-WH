@@ -20,19 +20,7 @@
             display: flex; justify-content: center; height: 100vh;
         }
 
-        #login-screen {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--bg-color); z-index: 9999;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-        }
-        .login-box {
-            background: white; padding: 30px; border-radius: 15px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1); text-align: center; width: 80%; max-width: 300px;
-        }
-        .login-input {
-            width: 100%; padding: 12px; margin: 15px 0; border: 2px solid #ddd;
-            border-radius: 8px; font-size: 18px; text-align: center;
-        }
+        /* ------------------ 移除登入畫面，保留狀態和截圖 Modal ------------------ */
 
         #status-modal {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -54,7 +42,7 @@
             border-radius: 5px; margin-top: 15px; cursor: pointer; display: none; font-size: 16px;
         }
 
-        #app-screen { display: none; width: 100%; max-width: 500px; height: 100%; overflow-y: auto; padding: 20px; box-sizing: border-box; }
+        #app-screen { width: 100%; max-width: 500px; height: 100%; overflow-y: auto; padding: 20px; box-sizing: border-box; }
         
         .author-header {
             text-align: center; font-size: 0.75rem; color: #999; padding-bottom: 10px;
@@ -158,11 +146,11 @@
         .anim-purple { animation: flash-purple 1s infinite; }
         .anim-green { animation: flash-green 2s infinite; }
 
-        .voice-controls { margin-top: 10px; }
+        .voice-controls { margin-top: 10px; display: flex; flex-direction: column; align-items: flex-start; } /* 靠左放置 */
         
         .quick-lang-container {
             display: flex; justify-content: flex-end; align-items: center;
-            margin-bottom: 5px;
+            margin-bottom: 5px; align-self: flex-end; /* 語言選擇靠右 */
         }
         .lang-icon { font-size: 1.2em; margin-right: 5px; }
         .small-select {
@@ -170,20 +158,68 @@
             font-size: 0.8rem; background-color: #fff; color: #555; outline: none;
         }
 
+        /* --- 🎤 開始錄音按鈕樣式修改：正方形靠左 --- */
+        .voice-btn-wrapper {
+            width: 100px; /* 寬度設置為正方形尺寸 */
+            height: 100px; /* 高度設置為正方形尺寸 */
+            margin: 10px 0; /* 靠左放置，且在上下添加一些空間 */
+        }
+
         .btn-voice { 
-            width: 100%; padding: 12px; border: none; border-radius: 8px; 
+            width: 100%; height: 100%; padding: 12px; border: none; border-radius: 12px; /* 將圓角調大 */
             background-color: #17a2b8; color: white; font-weight: bold; cursor: pointer;
             display: flex; justify-content: center; align-items: center; gap: 8px;
+            font-size: 16px; /* 錄音按鈕字體大小 */
+            flex-direction: column; /* 讓文字和圖標垂直排列 */
+            line-height: 1.2;
         }
-        .btn-voice.recording { background-color: var(--danger-color); animation: pulse 1s infinite; }
 
-        .footer-btns { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; padding-bottom: 30px;}
-        .btn-main { width: 100%; padding: 15px; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; color: white; }
+        .btn-voice.recording { background-color: var(--danger-color); animation: pulse 1s infinite; }
+        
+        .voice-timer {
+            text-align: right; font-size: 0.9em; color: #555; margin-top: 8px; font-weight: bold;
+            align-self: flex-end; /* 讓計時器靠右 */
+        }
+
+        /* --- 底部按鈕群組修改：2個一排，正方形，字體加大 --- */
+        .footer-btns-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr); /* 兩個按鈕平均分配空間 */
+            gap: 15px;
+            margin-top: 20px;
+            padding-bottom: 30px;
+        }
+        
+        /* 單獨將 View Photos 放在下一行，佔滿寬度 */
+        .btn-full-width {
+            grid-column: 1 / -1; /* 跨越所有欄位 */
+        }
+
+        .btn-main { 
+            width: 100%; 
+            padding: 15px; 
+            border: none; 
+            border-radius: 15px; /* 增大圓角 */
+            font-size: 18px; /* 字體加大 */
+            font-weight: bold; 
+            cursor: pointer; 
+            color: white; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            aspect-ratio: 1/1; /* 設為正方形 */
+            line-height: 1.2;
+            flex-direction: column; /* 讓內容垂直排列 */
+            text-align: center;
+        }
+        /* 讓文字/截圖按鈕的 flex-direction: row 保持不變 */
+        .footer-btns > button { flex-direction: row; } 
+
         .btn-save { background-color: var(--primary-color); }
         .btn-view { background-color: #6c757d; }
         .btn-drive { background-color: var(--drive-color); }
 
-        /* --- 設定彈窗 --- */
+        /* --- 設定彈窗 (保留) --- */
         #settings-modal {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center;
@@ -205,15 +241,6 @@
 </head>
 <body>
 
-    <div id="login-screen">
-        <div class="login-box">
-            <h3>🔒 Login (登入)</h3>
-            <p style="color:#666; font-size:0.9em;">Please enter password<br>(請輸入密碼)</p>
-            <input type="password" id="loginPass" class="login-input" placeholder="Password">
-            <button class="btn-main btn-save" onclick="checkLogin()">Login (進入)</button>
-        </div>
-    </div>
-
     <div id="status-modal">
         <div class="status-box">
             <div id="status-spinner" class="spinner"></div>
@@ -229,7 +256,7 @@
             <h3 style="color:#007bff; margin-top:0;">📸 截圖/分享</h3>
             <p style="font-size: 0.9em; color:#666;">(請長按下方圖片或使用手機截圖功能儲存)</p>
             <img id="screenshot-display" style="max-width: 100%; height: auto; border: 4px solid #f0fff0; box-shadow: 0 0 10px rgba(0, 230, 0, 0.8); margin-bottom: 15px; border-radius: 8px;">
-            <button class="btn-main btn-view" style="background-color: #6c757d;" onclick="closeScreenshotModal()">關閉</button>
+            <button class="btn-main btn-view" style="background-color: #6c757d; aspect-ratio: unset; flex-direction: row; padding: 10px 20px; width: 100%;" onclick="closeScreenshotModal()">關閉</button>
         </div>
     </div>
 
@@ -238,7 +265,7 @@
         <div class="author-header">Author: DERER LIN</div>
 
         <div class="header">
-            <div class="header-btn" onclick="logout()" title="Lock / Logout (鎖定/登出)">🔒</div>
+            <div class="header-btn" onclick="openSettings()" title="Settings (設定)">⚙️</div>
             <div class="header-title">
                 <h2>5S-audit WH<br>原管5S稽核</h2>
             </div>
@@ -283,24 +310,33 @@
                     </select>
                 </div>
 
-                <button type="button" class="btn-voice" id="voiceBtn" onclick="toggleVoice()">
-                    🎤 Start Voice (開始錄音)
-                </button>
-                <div style="text-align: right; font-size: 0.9em; color: #555; margin-top: 8px; font-weight: bold;">
+                <div class="voice-btn-wrapper">
+                    <button type="button" class="btn-voice" id="voiceBtn" onclick="toggleVoice()">
+                        🎤<br>Start Voice<br>(開始錄音)
+                    </button>
+                </div>
+                
+                <div class="voice-timer">
                     Time left: <span id="display-timeout" style="color:#d63384; font-size:1.1em;">10</span> s
                 </div>
             </div>
 
-            <div class="footer-btns" style="margin-top: 15px; padding-bottom: 0; flex-direction: row;">
-                <button class="btn-main btn-half" style="background-color: #008CBA; font-size: 14px; padding: 12px;" onclick="copyNote()">📋 複製文字</button>
-                <button class="btn-main btn-half" style="background-color: #ffc107; color:#333; font-size: 14px; padding: 12px;" onclick="captureScreenArea()">📸 截圖分享</button>
+            <div class="footer-btns" style="margin-top: 15px; padding-bottom: 0; flex-direction: row; gap: 10px;">
+                <button class="btn-main btn-half" style="background-color: #008CBA; font-size: 14px; padding: 12px; aspect-ratio: unset;" onclick="copyNote()">📋 複製文字</button>
+                <button class="btn-main btn-half" style="background-color: #ffc107; color:#333; font-size: 14px; padding: 12px; aspect-ratio: unset;" onclick="captureScreenArea()">📸 截圖分享</button>
             </div>
         </div>
 
-        <div class="footer-btns">
-            <button class="btn-main btn-save" id="saveBtn" onclick="saveToCloud()">💾 Save to Cloud (存檔至雲端)</button>
-            <button class="btn-main btn-view" onclick="viewExcel()">📊 View Excel (檢視 Excel)</button>
-            <button class="btn-main btn-drive" onclick="viewDriveFolder()">📂 View Photos (檢視雲端照片)</button>
+        <div class="footer-btns-grid">
+            <button class="btn-main btn-save" id="saveBtn" onclick="saveToCloud()">
+                💾<br>Save to Cloud<br>(存檔至雲端)
+            </button>
+            <button class="btn-main btn-view" onclick="viewExcel()">
+                📊<br>View Excel<br>(檢視 Excel)
+            </button>
+            <button class="btn-main btn-drive btn-full-width" onclick="viewDriveFolder()">
+                📂<br>View Photos<br>(檢視雲端照片)
+            </button>
         </div>
     </div>
 
@@ -311,11 +347,6 @@
                 <button onclick="closeSettings()" style="background:none; border:none; font-size:1.5rem; cursor:pointer;">&times;</button>
             </div>
             
-            <div class="modal-group" style="background: #f9f9f9; padding: 10px; border-radius: 8px; border: 1px dashed #ccc;">
-                <label style="color:#d63384;">🔑 Login Password (修改登入密碼)</label>
-                <input type="text" id="set-password" class="modal-input" placeholder="Current:1234">
-            </div>
-
             <div class="modal-group">
                 <label>1. Voice Timeout (錄音總秒數)</label>
                 <input type="number" id="set-timeout" class="modal-input" value="10">
@@ -352,13 +383,13 @@
                 <p>✅ Cloud Paths are Locked (System Mode)</p>
             </div>
 
-            <button class="btn-main btn-save" onclick="saveSettings()">Save Settings (儲存設定)</button>
+            <button class="btn-main btn-save" style="aspect-ratio: unset; flex-direction: row; padding: 15px;" onclick="saveSettings()">Save Settings (儲存設定)</button>
         </div>
     </div>
 
 <script>
     // ================= 初始化 & FIXED PATHS =================
-    const DEFAULT_PASS = "1234"; 
+    // const DEFAULT_PASS = "1234"; // 移除密碼相關設定
     
     const FIXED_SCRIPT_ID = "AKfycbyNpCvhWzd60mkmyxAwsEnIcOXCSOGaB2w_PSOjAVsUqr8JsDSgEcFZomZvoyBYeKmkjA/exec";
     const FIXED_SHEET_ID = "122NzrbD5CYValsDz4kKCdu7n-DDAfWH4fmEUj-EWRrg/edit?gid=0#gid=0"; 
@@ -376,41 +407,16 @@
     let snapshotText = ""; 
 
     window.onload = function() {
-        if(!localStorage.getItem("app_password")) {
-            localStorage.setItem("app_password", DEFAULT_PASS);
-        }
-        const isLoggedIn = localStorage.getItem("isLoggedIn");
-        if(isLoggedIn === "true") {
-            showApp();
-        } else {
-            document.getElementById('login-screen').style.display = 'flex';
-        }
+        // 移除所有密碼和登入檢查，直接顯示 app
+        showApp();
         loadSettingsToUI();
     };
 
-    function checkLogin() {
-        const input = document.getElementById('loginPass').value;
-        const storedPass = localStorage.getItem("app_password");
-        if(input === storedPass) {
-            localStorage.setItem("isLoggedIn", "true");
-            showApp();
-        } else {
-            alert("Wrong Password! (密碼錯誤)");
-        }
-    }
-
-    function logout() {
-        if(confirm("Lock and logout?\n(確定要鎖定並登出嗎？)")) {
-            localStorage.removeItem("isLoggedIn"); 
-            document.getElementById('app-screen').style.display = 'none';
-            document.getElementById('login-screen').style.display = 'flex'; 
-            document.getElementById('loginPass').value = ""; 
-            closeSettings();
-        }
-    }
+    // function checkLogin() { ... } // 移除
+    // function logout() { ... } // 移除
 
     function showApp() {
-        document.getElementById('login-screen').style.display = 'none';
+        // document.getElementById('login-screen').style.display = 'none'; // 移除
         document.getElementById('app-screen').style.display = 'block';
         applySettings(); 
     }
@@ -437,15 +443,13 @@
     }
 
     function saveSettings() {
-        const newPass = document.getElementById('set-password').value;
+        // 移除 newPass 相關邏輯
         const timeout = document.getElementById('set-timeout').value;
         const warning = document.getElementById('set-warning').value;
         const lang = document.getElementById('set-lang').value; 
         const ratio = document.getElementById('set-ratio').value;
 
-        if(newPass.trim() === "") { alert("Password cannot be empty!"); return; }
-
-        localStorage.setItem("app_password", newPass); 
+        // localStorage.setItem("app_password", newPass); // 移除
         localStorage.setItem("cfg_timeout", timeout);
         localStorage.setItem("cfg_warning", warning);
         localStorage.setItem("cfg_lang", lang);
@@ -459,7 +463,7 @@
     }
 
     function loadSettingsToUI() {
-        document.getElementById('set-password').value = localStorage.getItem("app_password");
+        // document.getElementById('set-password').value = localStorage.getItem("app_password"); // 移除
         document.getElementById('set-timeout').value = localStorage.getItem("cfg_timeout") || "10";
         document.getElementById('set-warning').value = localStorage.getItem("cfg_warning") || "3";
         const savedLang = localStorage.getItem("cfg_lang") || "cmn-Hant-TW";
@@ -488,7 +492,7 @@
         else tag.innerText = "Ratio: " + ratio.replace("/", ":");
     }
 
-    // ================= 圖片處理 =================
+    // ================= 圖片處理 (不變) =================
     function triggerCam() { document.getElementById('input-cam').click(); }
     function triggerGallery() { document.getElementById('input-gallery').click(); }
     function handleFile(input) {
@@ -551,7 +555,7 @@
         }
     }
 
-    // ================= 語音功能 =================
+    // ================= 語音功能 (不變) =================
     function toggleVoice() {
         if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
             alert("Browser not supported"); return;
@@ -574,7 +578,7 @@
         isRecording = true;
         isManualStop = false; 
         document.getElementById('voiceBtn').classList.add('recording');
-        document.getElementById('voiceBtn').innerText = "🛑 Stop";
+        document.getElementById('voiceBtn').innerHTML = "🛑<br>Stop"; /* 修改按鈕文字 */
         
         snapshotText = document.getElementById('noteInput').value;
         if(snapshotText.length > 0 && !snapshotText.endsWith(" ")) {
@@ -678,7 +682,7 @@
         if(punctuationTimer) clearTimeout(punctuationTimer);
         
         document.getElementById('voiceBtn').classList.remove('recording');
-        document.getElementById('voiceBtn').innerText = "🎤 Start Voice (開始錄音)";
+        document.getElementById('voiceBtn').innerHTML = "🎤<br>Start Voice<br>(開始錄音)"; /* 修改按鈕文字 */
         
         const noteInput = document.getElementById('noteInput');
         noteInput.classList.remove('anim-red', 'anim-purple', 'anim-green');
@@ -687,7 +691,7 @@
         document.getElementById('display-timeout').innerText = originalTime;
     }
 
-    // ================= 複製/截圖功能 (已修改為截圖顯示) =================
+    // ================= 複製/截圖功能 (不變) =================
 
     function closeScreenshotModal() {
         document.getElementById('screenshot-modal').style.display = 'none';
@@ -726,7 +730,7 @@
             });
     }
 
-    // ================= 上傳與檢視 =================
+    // ================= 上傳與檢視 (不變) =================
     function showStatus(type, title, subtitle) {
         const modal = document.getElementById('status-modal');
         const spinner = document.getElementById('status-spinner');
