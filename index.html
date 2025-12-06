@@ -40,8 +40,6 @@
             border-radius: 5px; margin-top: 15px; cursor: pointer; display: none; font-size: 16px;
         }
 
-        /* 移除 #screenshot-modal 相關的樣式 */
-        
         #app-screen { width: 100%; max-width: 500px; overflow-y: auto; padding: 20px; box-sizing: border-box; }
         
         .author-header {
@@ -123,7 +121,7 @@
         }
         textarea:focus { border-color: var(--primary-color); outline: none; }
         
-        /* --- 三階段閃爍動畫 --- */
+        /* --- 語音閃爍動畫 --- */
         @keyframes flash-red {
             0% { border-color: #eee; box-shadow: none; background-color: white; }
             50% { border-color: red; box-shadow: 0 0 15px rgba(255,0,0,0.6); background-color: #fff0f0; }
@@ -146,33 +144,44 @@
         .anim-purple { animation: flash-purple 1s infinite; }
         .anim-green { animation: flash-green 2s infinite; }
 
-        /* 新增：語音與複製按鈕容器，使用 Grid 實現兩欄佈局 */
+        /* 語音與複製按鈕容器，Grid 兩欄 */
         .voice-copy-controls { 
             margin-top: 10px; 
             display: grid; 
-            grid-template-columns: repeat(2, 1fr); /* 兩個按鈕平均分配空間 */
+            grid-template-columns: repeat(2, 1fr); 
             gap: 15px; 
             align-items: flex-start;
         } 
-        
-        /* 語言選擇 (保持靠右) */
-        .quick-lang-container {
-            grid-column: 2 / 3; /* 放在第二欄 */
-            justify-self: end;
-            display: flex; 
+
+        /* 新增：語言選擇/計時器容器，並排 */
+        .lang-timer-container {
+            grid-column: 1 / 3; /* 跨越兩欄 */
+            display: flex;
+            justify-content: space-between;
             align-items: center;
             margin-bottom: 5px; 
-            align-self: flex-end; 
+        }
+
+        .quick-lang-container {
+            display: flex; 
+            align-items: center;
         }
         .lang-icon { font-size: 1.2em; margin-right: 5px; }
         .small-select {
             padding: 4px 8px; border: 1px solid #ccc; border-radius: 15px; 
             font-size: 0.8rem; background-color: #fff; color: #555; outline: none;
         }
+        
+        .voice-timer {
+            text-align: right; 
+            font-size: 0.9em; 
+            color: #555; 
+            font-weight: bold;
+        }
 
-        /* --- 🎤 開始錄音按鈕樣式修改：正方形靠左 (第一欄) --- */
+        /* --- 🎤 開始錄音按鈕樣式：正方形 (第一欄) --- */
         .voice-btn-wrapper {
-            grid-column: 1 / 2; /* 放在第一欄 */
+            grid-column: 1 / 2; 
             width: 100%; 
             aspect-ratio: 1/1; 
             margin: 0;
@@ -190,9 +199,9 @@
 
         .btn-voice.recording { background-color: var(--danger-color); animation: pulse 1s infinite; }
         
-        /* --- 📋 複製文字按鈕樣式：正方形，第二欄 --- */
+        /* --- 📋 複製文字按鈕樣式：正方形 (第二欄) --- */
         .copy-btn-wrapper {
-            grid-column: 2 / 3; /* 放在第二欄 */
+            grid-column: 2 / 3; 
             width: 100%; 
             aspect-ratio: 1/1; 
             margin: 0;
@@ -211,13 +220,8 @@
             line-height: 1.2;
         }
         
-        /* 計時器 (跨兩欄) */
-        .voice-timer {
-            grid-column: 1 / 3; 
-            text-align: right; font-size: 0.9em; color: #555; margin-top: 8px; font-weight: bold;
-        }
 
-        /* --- 底部按鈕群組修改：2個一排，正方形，字體加大 (維持不變) --- */
+        /* --- 底部按鈕群組修改：2個一排，正方形，字體加大 --- */
         .footer-btns-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr); 
@@ -226,10 +230,6 @@
             padding-bottom: 30px;
         }
         
-        .btn-full-width {
-            grid-column: 1 / -1; 
-        }
-
         .btn-main { 
             width: 100%; 
             padding: 15px; 
@@ -242,10 +242,23 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            aspect-ratio: 1/1; 
             line-height: 1.2;
             flex-direction: column; 
             text-align: center;
+        }
+        
+        /* 縮減「存檔」和「檢視 Excel」按鈕高度 (仍然是正方形) */
+        .btn-main:not(.btn-drive) {
+             aspect-ratio: 1/1; 
+        }
+
+        /* 縮減「檢視雲端照片」按鈕高度 (縮減 50%) */
+        .btn-drive.btn-full-width {
+            grid-column: 1 / -1; 
+            aspect-ratio: 4 / 1; /* 調整為長方形，寬度是高度的 4 倍 (約 50% 高度) */
+            flex-direction: row; /* 讓內容水平排列，更適合長條形 */
+            gap: 15px;
+            font-size: 16px;
         }
         
         .btn-save { background-color: var(--primary-color); }
@@ -323,14 +336,20 @@
             
             <div class="voice-copy-controls">
                 
-                <div class="quick-lang-container">
-                    <span class="lang-icon">🌐</span>
-                    <select id="main-lang" class="small-select" onchange="syncLanguage('main')">
-                        <option value="cmn-Hant-TW">中文 (繁體)</option>
-                        <option value="en-US">English</option>
-                        <option value="ja-JP">日本語</option>
-                        <option value="hi-IN">Hindi (印地語)</option>
-                    </select>
+                <div class="lang-timer-container">
+                    <div class="quick-lang-container">
+                        <span class="lang-icon">🌐</span>
+                        <select id="main-lang" class="small-select" onchange="syncLanguage('main')">
+                            <option value="cmn-Hant-TW">中文 (繁體)</option>
+                            <option value="en-US">English</option>
+                            <option value="ja-JP">日本語</option>
+                            <option value="hi-IN">Hindi (印地語)</option>
+                        </select>
+                    </div>
+
+                    <div class="voice-timer">
+                        Time left: <span id="display-timeout" style="color:#d63384; font-size:1.1em;">10</span> s
+                    </div>
                 </div>
 
                 <div class="voice-btn-wrapper">
@@ -345,12 +364,9 @@
                     </button>
                 </div>
 
-                <div class="voice-timer">
-                    Time left: <span id="display-timeout" style="color:#d63384; font-size:1.1em;">10</span> s
-                </div>
             </div>
 
-            </div>
+        </div>
 
         <div class="footer-btns-grid">
             <button class="btn-main btn-save" id="saveBtn" onclick="saveToCloud()">
@@ -360,7 +376,7 @@
                 📊<br>View Excel<br>(檢視 Excel)
             </button>
             <button class="btn-main btn-drive btn-full-width" onclick="viewDriveFolder()">
-                📂<br>View Photos<br>(檢視雲端照片)
+                📂 View Photos (檢視雲端照片)
             </button>
         </div>
     </div>
@@ -440,7 +456,7 @@
         applySettings(); 
     }
 
-    // ================= 設定功能 & 語言同步 =================
+    // ================= 設定功能 & 語言同步 (不變) =================
     function openSettings() {
         loadSettingsToUI();
         document.getElementById('settings-modal').style.display = 'flex';
@@ -707,11 +723,10 @@
         document.getElementById('display-timeout').innerText = originalTime;
     }
 
-    // ================= 複製/截圖功能 (已修改) =================
+    // ================= 複製/截圖功能 (不變) =================
 
-    // 移除 closeScreenshotModal()
-    // 移除 captureScreenArea()
-    
+    // 由於截圖功能已移除，只需保留 copyNote()
+
     function copyNote() {
         const note = document.getElementById('noteInput').value;
         if (note.trim() === "") {
