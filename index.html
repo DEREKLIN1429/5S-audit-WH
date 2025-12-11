@@ -315,8 +315,8 @@
         </div>
 
         <div class="card">
-            <span class="section-title">0. User ID (使用者 ID) - Auto Saved</span>
-            <input type="text" id="userIdInput" class="modal-input" placeholder="Enter Your ID (請輸入您的ID)">
+            <span class="section-title">0. User Email (使用者信箱) - Auto ID</span>
+            <input type="email" id="userEmailInput" class="modal-input" placeholder="example@google.com">
         </div>
 
         <div class="card">
@@ -462,9 +462,9 @@
         // 移除登入檢查，直接顯示 App
         showApp();
         loadSettingsToUI();
-        // 載入儲存的 User ID
-        const savedUserId = localStorage.getItem("cfg_userId") || "";
-        document.getElementById('userIdInput').value = savedUserId;
+        // 載入儲存的 User Email
+        const savedUserEmail = localStorage.getItem("cfg_userEmail") || "";
+        document.getElementById('userEmailInput').value = savedUserEmail;
     };
 
     function showApp() {
@@ -789,18 +789,26 @@
     function saveToCloud() {
         const note = document.getElementById('noteInput').value;
         const workerId = document.getElementById('workerIdInput').value; 
-        const userId = document.getElementById('userIdInput').value; // 取得 User ID
+        const userEmail = document.getElementById('userEmailInput').value; 
         
-        // 儲存 User ID 到 LocalStorage
-        if(userId) {
-            localStorage.setItem("cfg_userId", userId);
+        // --- 修改：自動從 Email 擷取 ID ---
+        let userId = "";
+        if (userEmail.includes("@")) {
+            userId = userEmail.split("@")[0]; // 取 @ 前面的部分
+        } else {
+            userId = userEmail; // 如果沒有 @，直接當作 ID
+        }
+
+        // 儲存 Email 到 LocalStorage (下次自動填入)
+        if(userEmail) {
+            localStorage.setItem("cfg_userEmail", userEmail);
         }
 
         const folderId = FIXED_FOLDER_ID;
         const scriptUrl = `https://script.google.com/macros/s/${FIXED_SCRIPT_ID}/exec`;
 
         if(!processedImageBase64 && !note && !workerId && !userId) {
-            alert("Empty! Please take a photo, write a note, or enter ID."); return;
+            alert("Empty! Please take a photo, write a note, or enter Info."); return;
         }
 
         const btn = document.getElementById('saveBtn');
@@ -812,7 +820,7 @@
             image: processedImageBase64, 
             folderId: folderId,
             workerId: workerId,
-            userId: userId // 傳送 User ID
+            userId: userId // 傳送自動擷取的 ID
         };
 
         fetch(scriptUrl, {
@@ -824,7 +832,7 @@
             showStatus('success', 'Upload Success!', '上傳成功！');
             document.getElementById('noteInput').value = "";
             document.getElementById('workerIdInput').value = ""; 
-            // 注意：不清除 User ID
+            // 注意：不清除 User Email
             processedImageBase64 = "";
             document.getElementById('preview-img').style.display = 'none';
             document.querySelector('.placeholder').style.display = 'block';
